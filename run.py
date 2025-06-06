@@ -2,15 +2,16 @@ import ghslpy
 from shapely import wkt
 
 region = wkt.loads(
-  "POLYGON((-60.049 -34.0998, -57.88 -34.0998, -57.88 -35.1815, -60.049 -35.1815, -60.049 -34.0998))"
+  "POLYGON((-59.1168 -34.2511, -57.88 -34.2511, -57.88 -35.0306, -59.1168 -35.0306, -59.1168 -34.2511))"
 )
 
 data = ghslpy.download(
-  product="GHS-BUILT-S",
+  product="GHS-POP",
   epoch=2020,
   resolution="100m",
-  classification="RES+NRES",
+#   classification="AGBH",
   region=region # if not region, means that global=True
 )
 
-vector = ghslpy.vectorize(data, "built")
+vector = ghslpy.vectorize(data, "population")
+vector.to_csv('test.csv')

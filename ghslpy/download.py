@@ -47,23 +47,37 @@ def download(product, epoch, resolution=None, classification=None, region=None):
     # Determine if we need global or tiled data
     if region is None:
         # Global download
-        return _download_global(product_normalized, epoch, projection, resolution_value, version)
+        return _download_global(product_normalized, epoch, projection, resolution_value, version, classification)
     else:
         # Tiled download based on region
-        return _download_tiles(product_normalized, epoch, projection, resolution_value, version, region)
+        return _download_tiles(product_normalized, epoch, projection, resolution_value, version, region, classification)
 
 
-def _download_global(product, epoch, projection, resolution, version):
+def _download_global(product, epoch, projection, resolution, version, classification=None):
     """
     Download global GHSL data.
     """
+    # Get product info to determine URL pattern
+    from .products import get_product_info
+    product_info = get_product_info(product.replace('_', '-'))
+    
+    # Get the appropriate URL pattern based on classification
+    url_pattern = product_info["url_pattern"].get(classification, product_info["url_pattern"].get(None))
+    
+    # Format the base product name using the pattern
+    base_product_name = url_pattern.format(
+        product=product,
+        epoch=epoch,
+        classification=classification
+    )
+    
     # Construct URL for global file
     url_parts = [
         BASE_URL,
         f"{product}_GLOBE_R2023A",
-        f"{product}_E{epoch}_GLOBE_R2023A_{projection}_{resolution}",
+        f"{base_product_name}_GLOBE_R2023A_{projection}_{resolution}",
         version,
-        f"{product}_E{epoch}_GLOBE_R2023A_{projection}_{resolution}_{version.replace('-', '_')}.zip"
+        f"{base_product_name}_GLOBE_R2023A_{projection}_{resolution}_{version.replace('-', '_')}.zip"
     ]
     
     url = "/".join(url_parts)
@@ -72,10 +86,24 @@ def _download_global(product, epoch, projection, resolution, version):
     return _download_and_process_zip(url)
 
 
-def _download_tiles(product, epoch, projection, resolution, version, region):
+def _download_tiles(product, epoch, projection, resolution, version, region, classification=None):
     """
     Download GHSL data tiles that intersect with the given region.
     """
+    # Get product info to determine URL pattern
+    from .products import get_product_info
+    product_info = get_product_info(product.replace('_', '-'))
+    
+    # Get the appropriate URL pattern based on classification
+    url_pattern = product_info["url_pattern"].get(classification, product_info["url_pattern"].get(None))
+    
+    # Format the base product name using the pattern
+    base_product_name = url_pattern.format(
+        product=product,
+        epoch=epoch,
+        classification=classification
+    )
+    
     # Load the tiles GeoJSON
     tiles_path = Path(__file__).parent.parent / "assets" / "ghsl_tiles.geojson"
     tiles_gdf = gpd.read_file(tiles_path)
@@ -98,10 +126,10 @@ def _download_tiles(product, epoch, projection, resolution, version, region):
         url_parts = [
             BASE_URL,
             f"{product}_GLOBE_R2023A",
-            f"{product}_E{epoch}_GLOBE_R2023A_{projection}_{resolution}",
+            f"{base_product_name}_GLOBE_R2023A_{projection}_{resolution}",
             version,
             "tiles",
-            f"{product}_E{epoch}_GLOBE_R2023A_{projection}_{resolution}_{version.replace('-', '_')}_{tile_id}.zip"
+            f"{base_product_name}_GLOBE_R2023A_{projection}_{resolution}_{version.replace('-', '_')}_{tile_id}.zip"
         ]
         
         url = "/".join(url_parts)

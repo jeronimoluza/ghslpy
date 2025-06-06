@@ -6,39 +6,66 @@ Product definitions and metadata for GHSL products.
 PRODUCTS = {
     "GHS-BUILT-S": {
         "description": "Global Human Settlement Built-Up Surface",
-        "epochs": [1975, 1990, 2000, 2015, 2020],
-        "resolutions": ["30m", "100m", "1000m"],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2018, 2020, 2025, 2030],
+        "resolutions": ["100m", "1000m"],
         "classifications": ["RES+NRES", "NRES"],
         "default_resolution": "100m",
         "default_classification": "RES+NRES",
-        "normalized_name": "GHS_BUILT_S"
+        "normalized_name": "GHS_BUILT_S",
+        "url_pattern": {
+            "RES+NRES": "{product}_E{epoch}",  # Default, no suffix needed
+            "NRES": "{product}_NRES_E{epoch}"  # Add NRES suffix
+        }
     },
     "GHS-BUILT-H": {
         "description": "Global Human Settlement Built-Up Height",
         "epochs": [2018],
         "resolutions": ["100m"],
-        "classifications": ["AGBH","ANBH"],
+        "classifications": ["AGBH", "ANBH"],
         "default_resolution": "100m",
         "default_classification": "AGBH",
-        "normalized_name": "GHS_BUILT_H"
+        "normalized_name": "GHS_BUILT_H",
+        "url_pattern": {
+            "AGBH": "{product}_{classification}_E{epoch}",  # Always include classification
+            "ANBH": "{product}_{classification}_E{epoch}"   # Always include classification
+        }
+    },
+    "GHS-BUILT-V": {
+        "description": "Global Human Settlement Built-Up Volume",
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
+        "resolutions": ["100m", "1000m"],
+        "classifications": ["RES+NRES", "NRES"],
+        "default_resolution": "100m",
+        "default_classification": "RES+NRES",
+        "normalized_name": "GHS_BUILT_V",
+        "url_pattern": {
+            "RES+NRES": "{product}_E{epoch}",  # Default, no suffix needed
+            "NRES": "{product}_NRES_E{epoch}"  # Add NRES suffix
+        }
     },
     "GHS-POP": {
         "description": "Global Human Settlement Population",
-        "epochs": [1975, 1990, 2000, 2015, 2020],
-        "resolutions": ["30m", "100m", "1000m"],
-        "classifications": None,
-        "default_resolution": "100m",
-        "default_classification": None,
-        "normalized_name": "GHS_POP"
-    },
-    "GHS-SMOD": {
-        "description": "Global Human Settlement Settlement Model",
-        "epochs": [1975, 1990, 2000, 2015, 2020],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
         "resolutions": ["100m", "1000m"],
         "classifications": None,
         "default_resolution": "100m",
         "default_classification": None,
-        "normalized_name": "GHS_SMOD"
+        "normalized_name": "GHS_POP",
+        "url_pattern": {
+            None: "{product}_E{epoch}"  # Standard pattern with no classification
+        }
+    },
+    "GHS-SMOD": {
+        "description": "Global Human Settlement Settlement Model",
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
+        "resolutions": ["1000m"],
+        "classifications": None,
+        "default_resolution": "1000m",
+        "default_classification": None,
+        "normalized_name": "GHS_SMOD",
+        "url_pattern": {
+            None: "{product}_E{epoch}"  # Standard pattern with no classification
+        }
     }
 }
 

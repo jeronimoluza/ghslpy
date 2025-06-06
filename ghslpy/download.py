@@ -8,27 +8,32 @@ import xarray as xr
 import rioxarray
 import shapely
 import json
+from .products import validate_product_options
 
 
 BASE_URL = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 
 
-def download(product, epoch, resolution, classification=None, region=None):
+def download(product, epoch, resolution=None, classification=None, region=None):
     """
     Download GHSL products.
     
     Args:
         product (str): GHSL product name (e.g., "GHS-BUILT-S")
         epoch (int): Year of the data (e.g., 2020)
-        resolution (str): Resolution of the data (e.g., "100m")
-        classification (str, optional): Classification type (e.g., "RES+NRES")
+        resolution (str, optional): Resolution of the data (e.g., "100m"). 
+                                   If not provided, uses the default for the product.
+        classification (str, optional): Classification type (e.g., "RES+NRES").
+                                      If not provided, uses the default for the product if applicable.
         region (shapely.geometry.Polygon, optional): Region of interest. If None, global data is downloaded.
         
     Returns:
         xarray.Dataset: Dataset containing the downloaded data
     """
-    # Normalize product name (replace - with _)
-    product_normalized = product.replace("-", "_")
+    # Validate and normalize product options
+    product_normalized, epoch, resolution, classification = validate_product_options(
+        product, epoch, resolution, classification
+    )
     
     # Set default projection to Mollweide (54009)
     projection = "54009"

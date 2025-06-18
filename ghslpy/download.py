@@ -13,8 +13,43 @@ from .products import validate_product_options
 
 BASE_URL = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 
-
 def download(product, epoch, resolution=None, classification=None, region=None):
+    """
+    Download GHSL products for a single epoch or multiple epochs.
+    
+    Args:
+        product (str): GHSL product name (e.g., "GHS-BUILT-S")
+        epoch (int or list): Year(s) of the data (e.g., 2020 or [1975, 1990, 2000, 2015])
+        resolution (str, optional): Resolution of the data (e.g., "100m").
+        classification (str, optional): Classification type (e.g., "RES+NRES").
+        region (shapely.geometry.Polygon, optional): Region of interest. If None, global data is downloaded.
+        
+    Returns:
+        xarray.Dataset: Dataset containing the downloaded data, with a time dimension if epoch is a list
+    """
+    if isinstance(epoch, list):
+        # Download data for each epoch
+        datasets = []
+        for e in epoch:
+            ds = download_single(product, e, resolution, classification, region)
+            # Add time coordinate using the epoch year
+            time_coord = f"{e}-01-01"  # Format as YYYY-MM-DD
+            ds = ds.expand_dims({"time": [time_coord]})
+            datasets.append(ds)
+        
+        # Merge all datasets along the time dimension
+        if datasets:
+            merged_ds = xr.concat(datasets, dim="time")
+            return merged_ds
+        else:
+            raise ValueError(f"Failed to download data for any of the epochs: {epoch}")
+    else:
+        dataset = download_single(product, epoch, resolution, classification, region)
+        time_coord = f"{epoch}-01-01"  # Format as YYYY-MM-DD
+        dataset = dataset.expand_dims({"time": [time_coord]})
+        return dataset
+
+def download_single(product, epoch, resolution=None, classification=None, region=None):
     """
     Download GHSL products.
     
@@ -190,7 +225,8 @@ def _download_and_process_zip(url):
         for tif_file in tif_files:
             ds = rioxarray.open_rasterio(tif_file)
             # Convert to a dataset with a meaningful variable name based on the filename
-            var_name = os.path.basename(tif_file).split('.')[0].lower()
+            tif_name = os.path.basename(tif_file).split('.')[0]
+            var_name = "_".join(tif_name.split('_')[:2])
             ds = ds.to_dataset(name=var_name)
             datasets.append(ds)
         

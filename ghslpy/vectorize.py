@@ -16,7 +16,7 @@ def vectorize(data: xr.Dataset, variable_name: str):
                                If the input has a time dimension, a 'date' column is added
     """
     # Check if the dataset has a time dimension
-    if 'time' in data.dims and data.dims['time'] > 1:
+    if 'time' in data.sizes and data.sizes['time'] > 1:
         # Initialize an empty list to store GeoDataFrames for each time slice
         gdfs = []
         

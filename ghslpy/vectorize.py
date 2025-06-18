@@ -16,6 +16,14 @@ def vectorize(data: xr.Dataset):
                                If the input has a time dimension, a 'date' column is added
                                If the data is GHS-SMOD, class values are converted to strings and a domain column is added
     """
+
+
+    [var_name] = list(data.data_vars.keys())
+
+    # Variable name for GHS_BUILT_C shows as GHS_BUILT
+    if var_name == "GHS_BUILT":
+        var_name = "GHS_BUILT_C"
+
     # Check if the dataset has a time dimension
     if 'time' in data.sizes and data.sizes['time'] > 1:
         # Initialize an empty list to store GeoDataFrames for each time slice
@@ -26,7 +34,6 @@ def vectorize(data: xr.Dataset):
             # Extract the data for this time slice
             time_slice = data.sel(time=time_val)
             
-            [var_name] = list(time_slice.data_vars.keys())
             # Vectorize the time slice
             gdf = geocube_vectorize(time_slice.to_array().rename(var_name).squeeze().astype(float))
             
@@ -34,9 +41,7 @@ def vectorize(data: xr.Dataset):
             date_str = pd.to_datetime(str(time_val)).strftime('%Y-%m-%d')
             gdf['date'] = date_str
             
-            # Handle GHS-SMOD classification if applicable
-            if var_name == "GHS_SMOD":
-                _apply_smod_classification(gdf)
+            apply_classifications(gdf, var_name)
             
             gdfs.append(gdf)
         
@@ -48,13 +53,10 @@ def vectorize(data: xr.Dataset):
             raise ValueError("No valid data found for vectorization")
     else:
         # Original behavior for datasets without time dimension
-        [var_name] = list(data.data_vars.keys())
         gdf = geocube_vectorize(data.to_array().rename(var_name).squeeze().astype(float))
         
-        # Handle GHS-SMOD classification if applicable
-        if var_name == "GHS_SMOD":
-            _apply_smod_classification(gdf)
-            
+        apply_classifications(gdf, var_name)
+        
         return gdf.to_crs("EPSG:4326")
 
 def _apply_smod_classification(gdf):
@@ -78,3 +80,37 @@ def _apply_smod_classification(gdf):
     # Add domain column (Urban domain or Rural domain)
     domain_mapping = smod_info.get("domains", {})
     gdf['domain'] = gdf['class_value'].map(lambda x: domain_mapping.get(int(x), "Unknown domain"))
+
+def _apply_built_c_classification(gdf):
+    """
+    Apply GHS-BUILT-C classification to a GeoDataFrame.
+    Converts integer class values to string descriptions.
+    
+    Args:
+        gdf (geopandas.GeoDataFrame): GeoDataFrame with GHS_BUILT_C values
+    """
+    # Get the GHS-BUILT-C product info
+    built_c_info = get_product_info("GHS-BUILT-C")
+    
+    # Create a copy of the original numeric values
+    gdf['class_value'] = gdf['GHS_BUILT_C']
+    
+    # Map integer values to class descriptions
+    class_mapping = built_c_info.get("class_values", {})
+    gdf['GHS_BUILT_C'] = gdf['GHS_BUILT_C'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"))
+
+def apply_classifications(gdf, var_name):
+    """
+    Apply classifications to a GeoDataFrame based on the variable name.
+    
+    Args:
+        gdf (geopandas.GeoDataFrame): GeoDataFrame with variable values
+        var_name (str): Name of the variable
+    """
+    # Handle GHS-SMOD classification if applicable
+    if var_name == "GHS_SMOD":
+        _apply_smod_classification(gdf)
+    
+    # Handle GHS-BUILT-C classification if applicable
+    if var_name == "GHS_BUILT_C":
+        _apply_built_c_classification(gdf)

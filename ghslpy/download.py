@@ -186,6 +186,9 @@ def _download_tiles(product, epoch, projection, resolution, version, region, cla
     # Convert region to the same CRS as the data
     region_gdf = region_gdf.to_crs(f"ESRI:{projection}")
     
+    # Using clip_box before clip for performance
+    merged_ds = merged_ds.rio.clip_box(*region_gdf.total_bounds)
+
     # Clip the merged dataset to the region
     clipped_ds = merged_ds.rio.clip(region_gdf.geometry, region_gdf.crs)
     

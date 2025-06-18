@@ -86,6 +86,37 @@ PRODUCTS = {
             11: "Rural domain",
             10: "Rural domain"
         }
+    },
+    "GHS-BUILT-C": {
+        "description": "Global Human Settlement Built-up Characteristics",
+        "epochs": [2018],
+        "resolutions": ["10m"],
+        "classifications": ["MSZ", "FUN"],
+        "default_resolution": "10m",
+        "default_classification": "MSZ",
+        "normalized_name": "GHS_BUILT_C",
+        "url_pattern": {
+            "MSZ": "{product}_{classification}_E{epoch}",  # Always include classification
+            "FUN": "{product}_{classification}_E{epoch}"   # Always include classification
+        },
+        "class_values": {
+            1: "MSZ, open spaces, low vegetation surfaces NDVI <= 0.3",
+            2: "MSZ, open spaces, medium vegetation surfaces 0.3 < NDVI <= 0.5",
+            3: "MSZ, open spaces, high vegetation surfaces NDVI > 0.5",
+            4: "MSZ, open spaces, water surfaces LAND < 0.5",
+            5: "MSZ, open spaces, road surfaces",
+            11: "MSZ, built spaces, residential, building height <= 3m",
+            12: "MSZ, built spaces, residential, 3m < building height <= 6m",
+            13: "MSZ, built spaces, residential, 6m < building height <= 15m",
+            14: "MSZ, built spaces, residential, 15m < building height <= 30m",
+            15: "MSZ, built spaces, residential, building height > 30m",
+            21: "MSZ, built spaces, non-residential, building height <= 3m",
+            22: "MSZ, built spaces, non-residential, 3m < building height <= 6m",
+            23: "MSZ, built spaces, non-residential, 6m < building height <= 15m",
+            24: "MSZ, built spaces, non-residential, 15m < building height <= 30m",
+            25: "MSZ, built spaces, non-residential, building height > 30m",
+            
+        },
     }
 }
 

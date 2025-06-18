@@ -84,7 +84,7 @@ PRODUCTS = {
             13: "Rural domain",
             12: "Rural domain",
             11: "Rural domain",
-            10: "Rural domain"
+            10: "Water bodies"
         }
     },
     "GHS-BUILT-C": {

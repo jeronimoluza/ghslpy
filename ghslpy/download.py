@@ -143,11 +143,13 @@ def _download_tiles(product, epoch, projection, resolution, version, region, cla
     tiles_path = Path(__file__).parent.parent / "assets" / "ghsl_tiles.geojson"
     tiles_gdf = gpd.read_file(tiles_path)
     
-    # Create a GeoDataFrame from the region
-    region_gdf = gpd.GeoDataFrame(geometry=[region], crs="EPSG:4326")
+    if not isinstance(region, gpd.GeoDataFrame):
+        region_gdf = gpd.GeoDataFrame(geometry=[region], crs="EPSG:4326")
+    else:
+        region_gdf = region
     
     # Find tiles that intersect with the region
-    intersecting_tiles = tiles_gdf[tiles_gdf.intersects(region_gdf.iloc[0].geometry)]
+    intersecting_tiles = tiles_gdf[tiles_gdf.intersects(region_gdf.union_all())]
     
     if len(intersecting_tiles) == 0:
         raise ValueError("The provided region does not intersect with any GHSL tiles")

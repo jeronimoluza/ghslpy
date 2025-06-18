@@ -3,6 +3,9 @@ Utility functions for ghslpy.
 """
 from tabulate import tabulate
 from .products import PRODUCTS
+import osmnx as ox
+import pandas as pd
+import geopandas as gpd
 
 
 def list_products():
@@ -57,3 +60,26 @@ def list_product_options(product):
     
     except ValueError as e:
         print(f"Error: {e}")
+
+def find_region(query: str | list) -> gpd.GeoDataFrame:
+    """
+    Find the boundary of a region using OpenStreetMap.
+
+    Parameters:
+    - query (str | list): The query to search for the region.
+
+    Returns:
+    - gpd.GeoDataFrame: The boundary of the region.
+    """
+    if isinstance(query, list):
+        gdf = gpd.GeoDataFrame(
+            pd.concat(
+                [ox.geocode_to_gdf(query=region) for region in query],
+                ignore_index=True,
+            ),
+            geometry="geometry",
+        )
+        return gdf
+    else:
+        gdf = ox.geocode_to_gdf(query=query)
+        return gdf

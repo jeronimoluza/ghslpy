@@ -227,7 +227,7 @@ def _download_and_process_zip(url):
             # Convert to a dataset with a meaningful variable name based on the filename
             tif_name = os.path.basename(tif_file).split('.')[0]
             var_name = "_".join(tif_name.split('_')[:2])
-            ds = ds.to_dataset(name=var_name)
+            ds = ds.to_dataset(name=var_name, promote_attrs=True)
             datasets.append(ds)
         
         # Merge all datasets

@@ -8,12 +8,12 @@ region = wkt.loads(
 
 epochs = [2015, 2020]
 data = ghslpy.download(
-    product="GHS-POP",
+    product="GHS-BUILT-S",
     epoch=epochs,
     resolution="100m",
     #   classification="AGBH",
     region=region,  # if not region, means that global=True
 )
 
-vector = ghslpy.vectorize(data, "population")
+vector = ghslpy.vectorize(data)
 vector.to_csv("test.csv")

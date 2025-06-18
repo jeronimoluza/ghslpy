@@ -2,6 +2,7 @@ from geocube.vector import vectorize as geocube_vectorize
 import xarray as xr
 import geopandas as gpd
 import pandas as pd
+from .products import get_product_info
 
 def vectorize(data: xr.Dataset):
     """
@@ -13,6 +14,7 @@ def vectorize(data: xr.Dataset):
     Returns:
         geopandas.GeoDataFrame: Vectorized data with geometry and variable values
                                If the input has a time dimension, a 'date' column is added
+                               If the data is GHS-SMOD, class values are converted to strings and a domain column is added
     """
     # Check if the dataset has a time dimension
     if 'time' in data.sizes and data.sizes['time'] > 1:
@@ -32,6 +34,10 @@ def vectorize(data: xr.Dataset):
             date_str = pd.to_datetime(str(time_val)).strftime('%Y-%m-%d')
             gdf['date'] = date_str
             
+            # Handle GHS-SMOD classification if applicable
+            if var_name == "GHS_SMOD":
+                _apply_smod_classification(gdf)
+            
             gdfs.append(gdf)
         
         # Combine all GeoDataFrames
@@ -42,5 +48,33 @@ def vectorize(data: xr.Dataset):
             raise ValueError("No valid data found for vectorization")
     else:
         # Original behavior for datasets without time dimension
+        [var_name] = list(data.data_vars.keys())
         gdf = geocube_vectorize(data.to_array().rename(var_name).squeeze().astype(float))
+        
+        # Handle GHS-SMOD classification if applicable
+        if var_name == "GHS_SMOD":
+            _apply_smod_classification(gdf)
+            
         return gdf.to_crs("EPSG:4326")
+
+def _apply_smod_classification(gdf):
+    """
+    Apply GHS-SMOD classification to a GeoDataFrame.
+    Converts integer class values to string descriptions and adds a domain column.
+    
+    Args:
+        gdf (geopandas.GeoDataFrame): GeoDataFrame with GHS_SMOD values
+    """
+    # Get the GHS-SMOD product info
+    smod_info = get_product_info("GHS-SMOD")
+    
+    # Create a copy of the original numeric values
+    gdf['class_value'] = gdf['GHS_SMOD']
+    
+    # Map integer values to class descriptions
+    class_mapping = smod_info.get("class_values", {})
+    gdf['GHS_SMOD'] = gdf['GHS_SMOD'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"))
+    
+    # Add domain column (Urban domain or Rural domain)
+    domain_mapping = smod_info.get("domains", {})
+    gdf['domain'] = gdf['class_value'].map(lambda x: domain_mapping.get(int(x), "Unknown domain"))

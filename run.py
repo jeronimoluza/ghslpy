@@ -6,11 +6,11 @@ region = wkt.loads(
     "POLYGON((-58.9959 -34.247, -58.7996 -34.247, -58.7996 -34.4268, -58.9959 -34.4268, -58.9959 -34.247))"
 )
 
-epochs = [2015, 2020]
+epochs = [2015, 2020, 2025]
 data = ghslpy.download(
-    product="GHS-BUILT-S",
+    product="GHS-SMOD",
     epoch=epochs,
-    resolution="100m",
+    resolution="1000m",
     #   classification="AGBH",
     region=region,  # if not region, means that global=True
 )

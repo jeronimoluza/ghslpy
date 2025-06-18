@@ -65,6 +65,26 @@ PRODUCTS = {
         "normalized_name": "GHS_SMOD",
         "url_pattern": {
             None: "{product}_E{epoch}"  # Standard pattern with no classification
+        },
+        "class_values": {
+            30: "Urban Centre grid cell",
+            23: "Dense Urban Cluster grid cell",
+            22: "Semi-dense Urban Cluster grid cell",
+            21: "Suburban or per-urban grid cell",
+            13: "Rural cluster grid cell",
+            12: "Low Density Rural grid cell",
+            11: "Very low density rural grid cell",
+            10: "Water grid cell"
+        },
+        "domains": {
+            30: "Urban domain",
+            23: "Urban domain",
+            22: "Urban domain",
+            21: "Urban domain",
+            13: "Rural domain",
+            12: "Rural domain",
+            11: "Rural domain",
+            10: "Rural domain"
         }
     }
 }

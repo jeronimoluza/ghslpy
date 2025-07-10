@@ -1,16 +1,16 @@
 import ghslpy
 
 region = ghslpy.utils.find_region(
-    ["Provincia de Buenos Aires", "Ciudad Autónoma de Buenos Aires"]
+    ["Ciudad Autónoma de Buenos Aires"]
 )
 
-epochs = [2025]
+epochs = [2020, 2025]
 data = ghslpy.download(
-    product="GHS-SMOD",
+    products=["GHS-POP", "GHS-BUILT-S"],
     epoch=epochs,
     resolution="1000m",
-    region=region,  # if not region, means that global=True
+    region=region,
 )
-vector = ghslpy.vectorize(data)
-vector.to_csv("test.csv")
+# vector = ghslpy.vectorize(data)
+# vector.to_csv("test.csv")
 

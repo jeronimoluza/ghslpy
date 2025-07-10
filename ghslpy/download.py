@@ -15,13 +15,13 @@ FILL_VALUE = -200
 
 
 def download(
-    product, epoch, resolution=None, classification=None, region=None
+    products, epoch, resolution=None, classification=None, region=None
 ):
     """
     Download GHSL products for a single epoch or multiple epochs.
 
     Args:
-        product (str): GHSL product name (e.g., "GHS-BUILT-S")
+        products (str or list): GHSL product name(s) (e.g., "GHS-BUILT-S" or ["GHS-BUILT-S", "GHS-POP"])
         epoch (int or list): Year(s) of the data (e.g., 2020 or [1975, 1990, 2000, 2015])
         resolution (str, optional): Resolution of the data (e.g., "100m").
         classification (str, optional): Classification type (e.g., "RES+NRES").
@@ -29,34 +29,62 @@ def download(
 
     Returns:
         xarray.Dataset: Dataset containing the downloaded data, with a time dimension if epoch is a list
+                        and data from all requested products as separate variables
     """
+    # Convert products to list if it's a string
+    if isinstance(products, str):
+        products = [products]
+    
     if isinstance(epoch, list):
-        # Download data for each epoch
-        datasets = []
+        # Download data for each epoch and each product
+        all_datasets = []
         for e in epoch:
-            ds = download_single(
-                product, e, resolution, classification, region
-            )
-            # Add time coordinate using the epoch year
-            time_coord = f"{e}-01-01"  # Format as YYYY-MM-DD
-            ds = ds.expand_dims({"time": [time_coord]})
-            datasets.append(ds)
+            epoch_datasets = []
+            for product in products:
+                ds = download_single(
+                    product, e, resolution, classification, region
+                )
+                # Add time coordinate using the epoch year
+                time_coord = f"{e}-01-01"  # Format as YYYY-MM-DD
+                ds = ds.expand_dims({"time": [time_coord]})
+                epoch_datasets.append(ds)
+            
+            # Merge all products for this epoch
+            if epoch_datasets:
+                merged_epoch_ds = xr.merge(epoch_datasets)
+                all_datasets.append(merged_epoch_ds)
+            else:
+                raise ValueError(
+                    f"Failed to download data for epoch: {e}"
+                )
 
         # Merge all datasets along the time dimension
-        if datasets:
-            merged_ds = xr.concat(datasets, dim="time")
+        if all_datasets:
+            merged_ds = xr.concat(all_datasets, dim="time")
             return merged_ds
         else:
             raise ValueError(
                 f"Failed to download data for any of the epochs: {epoch}"
             )
     else:
-        dataset = download_single(
-            product, epoch, resolution, classification, region
-        )
-        time_coord = f"{epoch}-01-01"  # Format as YYYY-MM-DD
-        dataset = dataset.expand_dims({"time": [time_coord]})
-        return dataset
+        # Download data for each product for a single epoch
+        product_datasets = []
+        for product in products:
+            ds = download_single(
+                product, epoch, resolution, classification, region
+            )
+            time_coord = f"{epoch}-01-01"  # Format as YYYY-MM-DD
+            ds = ds.expand_dims({"time": [time_coord]})
+            product_datasets.append(ds)
+        
+        # Merge all products
+        if product_datasets:
+            merged_ds = xr.merge(product_datasets)
+            return merged_ds
+        else:
+            raise ValueError(
+                f"Failed to download data for epoch: {epoch}"
+            )
 
 
 def download_single(
@@ -283,7 +311,7 @@ def _download_and_process_zip(url, region_gdf):
             )
             fillvalues.append(ds._FillValue)
             ds = ds.fillna(ds._FillValue)
-            ds = ds.to_dataset(name=var_name, promote_attrs=True)
+            ds = ds.to_dataset(name=var_name)
             datasets.append(ds)
 
         assert (

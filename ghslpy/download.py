@@ -259,7 +259,7 @@ def _download_tiles(
 
     # Merge all datasets
     merged_ds = xr.merge(datasets)
-    merged_ds = merged_ds.fillna(FILL_VALUE)  # ADDRESS THIS
+    # merged_ds = merged_ds.fillna(FILL_VALUE)  # ADDRESS THIS
 
     return merged_ds
 
@@ -311,6 +311,7 @@ def _download_and_process_zip(url, region_gdf):
             )
             fillvalues.append(ds._FillValue)
             ds = ds.fillna(ds._FillValue)
+            ds = ds.where(ds != ds._FillValue)
             ds = ds.to_dataset(name=var_name)
             datasets.append(ds)
 

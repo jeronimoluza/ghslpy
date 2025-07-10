@@ -18,7 +18,6 @@ data = ghslpy.download(
   product="GHS-BUILT-S",
   epoch=2020,
   resolution="100m",
-  classification="RES+NRES",
   region=region # if not region, means that global=True
 )
 ```

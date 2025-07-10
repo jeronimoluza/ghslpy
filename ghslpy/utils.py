@@ -83,3 +83,19 @@ def find_region(query: str | list) -> gpd.GeoDataFrame:
     else:
         gdf = ox.geocode_to_gdf(query=query)
         return gdf
+
+def download_gadm(iso3_code: str, adm_level: int = 0):
+    """
+    Download GADM data for a specific country and administrative level.
+
+    Parameters:
+    - iso3_code (str): ISO 3 code of the country.
+    - adm_level (int): Administrative level (0 for country, 1 for province, 2 for district).
+
+    Returns:
+    - gpd.GeoDataFrame: The GADM data for the specified country and administrative level.
+    """
+    return gpd.read_file(
+        f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{iso3_code}.gpkg",
+        layer=f"ADM_ADM_{adm_level}",
+    )

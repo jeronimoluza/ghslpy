@@ -365,3 +365,187 @@ def monocentric_polycentric_pattern(pop_data: xr.DataArray,
     )
     
     return result
+    
+def built_up_binary_mask(built_data: xr.DataArray, threshold: float = 500.0) -> xr.DataArray:
+    """
+    Create a binary mask of built-up areas exceeding a threshold.
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array in square meters per pixel
+    threshold : float, optional
+        Built-up area threshold in square meters, by default 500.0
+        
+    Returns
+    -------
+    xr.DataArray
+        Binary mask (1 for built-up areas above threshold, 0 otherwise)
+    """
+    mask = xr.where(built_data >= threshold, 1, 0)
+    mask.attrs['units'] = 'binary'
+    mask.attrs['long_name'] = 'Built-up binary mask'
+    mask.attrs['threshold'] = f"{threshold} m²"
+    return mask
+
+
+def population_per_built_up_area(pop_data: xr.DataArray, built_data: xr.DataArray) -> xr.DataArray:
+    """
+    Calculate population per square meter of built-up area.
+    
+    Parameters
+    ----------
+    pop_data : xr.DataArray
+        Population count data array
+    built_data : xr.DataArray
+        Built-up area data array in square meters per pixel
+        
+    Returns
+    -------
+    xr.DataArray
+        Population per square meter of built-up area
+    """
+    # Avoid division by zero by setting a minimum built-up area
+    safe_built = xr.where(built_data > 0, built_data, np.nan)
+    
+    # Calculate population per built-up area
+    pop_per_built = pop_data / safe_built
+    
+    # Set attributes
+    pop_per_built.attrs['units'] = 'people/m²'
+    pop_per_built.attrs['long_name'] = 'Population per built-up area'
+    
+    return pop_per_built
+
+
+def built_up_growth_rate(built_data: xr.DataArray, time_dim: str = 'time', 
+                        min_built: float = 1.0) -> xr.DataArray:
+    """
+    Calculate per-pixel percentage change in built-up area between consecutive time periods.
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array with a time dimension (in square meters)
+    time_dim : str, optional
+        Name of the time dimension, by default 'time'
+    min_built : float, optional
+        Minimum built-up area threshold to avoid division by zero, by default 1.0
+        
+    Returns
+    -------
+    xr.DataArray
+        Percentage change in built-up area
+    """
+    # Shift the data along the time dimension to calculate differences
+    built_shifted = built_data.shift({time_dim: -1})
+    abs_change = built_shifted - built_data
+    
+    # Get the base built-up area for each period (avoiding division by zero)
+    base_built = built_data.isel({time_dim: slice(0, -1)})
+    base_built = xr.where(base_built < min_built, min_built, base_built)
+    
+    # Calculate percentage change
+    rel_change = (abs_change / base_built) * 100
+    
+    # Drop the last time period which will be NaN after the shift
+    rel_change = rel_change.isel({time_dim: slice(0, -1)})
+    
+    rel_change.attrs['units'] = '%'
+    rel_change.attrs['long_name'] = 'Built-up area growth rate'
+    
+    return rel_change
+
+
+def population_growth_rate(pop_data: xr.DataArray, time_dim: str = 'time', 
+                          min_pop: float = 1.0) -> xr.DataArray:
+    """
+    Calculate per-pixel percentage change in population between consecutive time periods.
+    
+    Parameters
+    ----------
+    pop_data : xr.DataArray
+        Population data array with a time dimension
+    time_dim : str, optional
+        Name of the time dimension, by default 'time'
+    min_pop : float, optional
+        Minimum population threshold to avoid division by zero, by default 1.0
+        
+    Returns
+    -------
+    xr.DataArray
+        Percentage change in population
+    """
+    # This is similar to relative_population_change but with a clearer name
+    # for consistency with built_up_growth_rate
+    return relative_population_change(pop_data, time_dim, min_pop)
+
+
+def built_up_area_per_capita(built_data: xr.DataArray, pop_data: xr.DataArray) -> xr.DataArray:
+    """
+    Calculate built-up area per capita (square meters per person).
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array in square meters per pixel
+    pop_data : xr.DataArray
+        Population count data array
+        
+    Returns
+    -------
+    xr.DataArray
+        Built-up area per capita in square meters per person
+    """
+    # Avoid division by zero by setting a minimum population
+    safe_pop = xr.where(pop_data > 0, pop_data, np.nan)
+    
+    # Calculate built-up area per capita
+    built_per_capita = built_data / safe_pop
+    
+    # Set attributes
+    built_per_capita.attrs['units'] = 'm²/person'
+    built_per_capita.attrs['long_name'] = 'Built-up area per capita'
+    
+    return built_per_capita
+
+
+def decoupling_index(built_data: xr.DataArray, pop_data: xr.DataArray, 
+                    time_dim: str = 'time', min_built: float = 1.0, 
+                    min_pop: float = 1.0) -> xr.DataArray:
+    """
+    Calculate decoupling index as the difference between built-up growth rate 
+    and population growth rate.
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array with a time dimension (in square meters)
+    pop_data : xr.DataArray
+        Population data array with a time dimension
+    time_dim : str, optional
+        Name of the time dimension, by default 'time'
+    min_built : float, optional
+        Minimum built-up area threshold to avoid division by zero, by default 1.0
+    min_pop : float, optional
+        Minimum population threshold to avoid division by zero, by default 1.0
+        
+    Returns
+    -------
+    xr.DataArray
+        Decoupling index (positive values indicate built-up growth exceeds population growth,
+        negative values indicate population growth exceeds built-up growth)
+    """
+    # Calculate growth rates
+    built_growth = built_up_growth_rate(built_data, time_dim, min_built)
+    pop_growth = population_growth_rate(pop_data, time_dim, min_pop)
+    
+    # Calculate decoupling index
+    decoupling = built_growth - pop_growth
+    
+    # Set attributes
+    decoupling.attrs['units'] = 'percentage points'
+    decoupling.attrs['long_name'] = 'Decoupling index'
+    decoupling.attrs['description'] = 'Difference between built-up growth rate and population growth rate'
+    
+    return decoupling

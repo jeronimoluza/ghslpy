@@ -88,6 +88,64 @@ def relative_population_change(pop_data: xr.DataArray, time_dim: str = 'time',
     rel_change.attrs['long_name'] = 'Relative population change'
     return rel_change
 
+def absolute_built_up_change(built_data: xr.DataArray, time_dim: str = 'time') -> xr.DataArray:
+    """
+    Calculate absolute built-up change between consecutive time periods.
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array with a time dimension (in square meters)
+    time_dim : str, optional
+        Name of the time dimension, by default 'time'
+        
+    Returns
+    -------
+    xr.DataArray
+        Absolute built-up change
+    """
+    built_shifted = built_data.shift({time_dim: -1})
+    change = built_shifted - built_data
+    
+    # Drop the last time period which will be NaN after the shift
+    change = change.isel({time_dim: slice(0, -1)})
+    
+    change.attrs['units'] = 'm²'
+    change.attrs['long_name'] = 'Absolute built-up change'
+    return change
+
+def relative_built_up_change(built_data: xr.DataArray, time_dim: str = 'time', 
+                            min_built: float = 1.0) -> xr.DataArray:
+    """
+    Calculate relative (percentage) built-up change between consecutive time periods.
+    
+    Parameters
+    ----------
+    built_data : xr.DataArray
+        Built-up area data array with a time dimension (in square meters)
+    time_dim : str, optional
+        Name of the time dimension, by default 'time'
+    min_built : float, optional
+        Minimum built-up area threshold to avoid division by zero, by default 1.0
+        
+    Returns
+    -------
+    xr.DataArray
+        Relative built-up change (percentage)
+    """
+    # Calculate absolute change
+    abs_change = absolute_built_up_change(built_data, time_dim)
+    
+    # Get the base built-up area for each period (avoiding division by zero)
+    base_built = built_data.isel({time_dim: slice(0, -1)})
+    base_built = xr.where(base_built < min_built, min_built, base_built)
+    
+    # Calculate percentage change
+    rel_change = (abs_change / base_built) * 100
+    
+    rel_change.attrs['units'] = '%'
+    rel_change.attrs['long_name'] = 'Relative built-up change'
+    return rel_change
 
 def population_momentum(pop_data: xr.DataArray, time_dim: str = 'time') -> xr.DataArray:
     """
@@ -437,24 +495,7 @@ def built_up_growth_rate(built_data: xr.DataArray, time_dim: str = 'time',
     xr.DataArray
         Percentage change in built-up area
     """
-    # Shift the data along the time dimension to calculate differences
-    built_shifted = built_data.shift({time_dim: -1})
-    abs_change = built_shifted - built_data
-    
-    # Get the base built-up area for each period (avoiding division by zero)
-    base_built = built_data.isel({time_dim: slice(0, -1)})
-    base_built = xr.where(base_built < min_built, min_built, base_built)
-    
-    # Calculate percentage change
-    rel_change = (abs_change / base_built) * 100
-    
-    # Drop the last time period which will be NaN after the shift
-    rel_change = rel_change.isel({time_dim: slice(0, -1)})
-    
-    rel_change.attrs['units'] = '%'
-    rel_change.attrs['long_name'] = 'Built-up area growth rate'
-    
-    return rel_change
+    return relative_built_up_change(built_data, time_dim, min_built)
 
 
 def population_growth_rate(pop_data: xr.DataArray, time_dim: str = 'time', 

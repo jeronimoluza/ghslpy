@@ -4,13 +4,20 @@ region = ghslpy.utils.find_region(
     ["Ciudad Autónoma de Buenos Aires"]
 )
 
+# region = ghslpy.utils.wkt_as_gdf(
+#     "POLYGON((-59.9 -33.83, -57.28 -33.83, -57.28 -35.25, -59.9 -35.25, -59.9 -33.83))"
+#     )
+
 epochs = [2020, 2025]
 data = ghslpy.download(
-    products=["GHS-POP", "GHS-BUILT-S"],
+    products="GHS-POP",
     epoch=epochs,
-    resolution="1000m",
+    resolution="100m",
     region=region,
 )
-# vector = ghslpy.vectorize(data)
-# vector.to_csv("test.csv")
 
+from ghslpy.metrics.pixelwise import population_density
+clusters = population_density(data["GHS_POP"].isel(time=0))
+vector = ghslpy.vectorize(clusters.to_dataset(name='population_density'))
+
+print(vector)

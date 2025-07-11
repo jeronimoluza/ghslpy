@@ -6,6 +6,7 @@ from .products import PRODUCTS
 import osmnx as ox
 import pandas as pd
 import geopandas as gpd
+import shapely
 
 
 def list_products():
@@ -98,4 +99,10 @@ def download_gadm(iso3_code: str, adm_level: int = 0):
     return gpd.read_file(
         f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{iso3_code}.gpkg",
         layer=f"ADM_ADM_{adm_level}",
+    )
+
+def wkt_as_gdf(wkt: str) -> gpd.GeoDataFrame:
+    return gpd.GeoDataFrame(
+        geometry=[shapely.wkt.loads(wkt)],
+        crs="EPSG:4326",
     )

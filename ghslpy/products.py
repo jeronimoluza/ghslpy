@@ -6,7 +6,7 @@ Product definitions and metadata for GHSL products.
 PRODUCTS = {
     "GHS-BUILT-S": {
         "description": "Global Human Settlement Built-Up Surface",
-        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2018, 2020, 2025, 2030],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030],
         "resolutions": ["100m", "1000m"],
         "classifications": ["RES+NRES", "NRES"],
         "default_resolution": "100m",
@@ -32,7 +32,7 @@ PRODUCTS = {
     },
     "GHS-BUILT-V": {
         "description": "Global Human Settlement Built-Up Volume",
-        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030],
         "resolutions": ["100m", "1000m"],
         "classifications": ["RES+NRES", "NRES"],
         "default_resolution": "100m",
@@ -45,7 +45,7 @@ PRODUCTS = {
     },
     "GHS-POP": {
         "description": "Global Human Settlement Population",
-        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030],
         "resolutions": ["100m", "1000m"],
         "classifications": None,
         "default_resolution": "100m",
@@ -57,7 +57,7 @@ PRODUCTS = {
     },
     "GHS-SMOD": {
         "description": "Global Human Settlement Settlement Model",
-        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2015, 2020, 2025, 2030],
+        "epochs": [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030],
         "resolutions": ["1000m"],
         "classifications": None,
         "default_resolution": "1000m",

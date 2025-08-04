@@ -2,7 +2,7 @@ from geocube.vector import vectorize as geocube_vectorize
 import xarray as xr
 import geopandas as gpd
 import pandas as pd
-from .products import get_product_info
+from ..products import get_product_info
 
 def vectorize(data: xr.Dataset):
     """
@@ -75,11 +75,11 @@ def _apply_smod_classification(gdf):
     
     # Map integer values to class descriptions
     class_mapping = smod_info.get("class_values", {})
-    gdf['GHS_SMOD'] = gdf['GHS_SMOD'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"))
+    gdf['GHS_SMOD'] = gdf['GHS_SMOD'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"), na_action='ignore')
     
     # Add domain column (Urban domain or Rural domain)
     domain_mapping = smod_info.get("domains", {})
-    gdf['domain'] = gdf['class_value'].map(lambda x: domain_mapping.get(int(x), "Unknown domain"))
+    gdf['domain'] = gdf['class_value'].map(lambda x: domain_mapping.get(int(x), "Unknown domain"), na_action='ignore')
 
 def _apply_built_c_classification(gdf):
     """
@@ -97,7 +97,7 @@ def _apply_built_c_classification(gdf):
     
     # Map integer values to class descriptions
     class_mapping = built_c_info.get("class_values", {})
-    gdf['GHS_BUILT_C'] = gdf['GHS_BUILT_C'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"))
+    gdf['GHS_BUILT_C'] = gdf['GHS_BUILT_C'].map(lambda x: class_mapping.get(int(x), f"Unknown class {int(x)}"), na_action='ignore')
 
 def apply_classifications(gdf, var_name):
     """

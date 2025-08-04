@@ -196,5 +196,5 @@ cython_debug/
 .DS_Store
 cache/
 
-notebooks/
+# notebooks/
 data/

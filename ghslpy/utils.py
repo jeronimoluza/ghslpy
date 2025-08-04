@@ -102,7 +102,19 @@ def download_gadm(iso3_code: str, adm_level: int = 0):
     )
 
 def wkt_as_gdf(wkt: str) -> gpd.GeoDataFrame:
+    """
+    Convert a WKT string to a GeoDataFrame.
+    """
     return gpd.GeoDataFrame(
         geometry=[shapely.wkt.loads(wkt)],
         crs="EPSG:4326",
     )
+
+def load_csv(csv_path: str, kwargs: dict = {}) -> gpd.GeoDataFrame:
+    """
+    Load a CSV file into a GeoDataFrame.
+    """
+    df = pd.read_csv(csv_path, **kwargs)
+    df['geometry'] = df['geometry'].apply(shapely.wkt.loads)
+    return gpd.GeoDataFrame(df, geometry='geometry')
+    

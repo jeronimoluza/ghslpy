@@ -11,7 +11,6 @@ from .products import validate_product_options
 
 
 BASE_URL = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
-FILL_VALUE = -200
 
 
 def download(
@@ -259,7 +258,6 @@ def _download_tiles(
 
     # Merge all datasets
     merged_ds = xr.merge(datasets)
-    # merged_ds = merged_ds.fillna(FILL_VALUE)  # ADDRESS THIS
 
     return merged_ds
 

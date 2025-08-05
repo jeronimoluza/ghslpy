@@ -122,6 +122,31 @@ Plotting the difference between two years highlights the areas with the most sig
 **Built-up Area Addition (1975-2025)**
 ![GHS-BUILT Addition](./assets/ghs_built_addition.png)
 
+### Vectorization
+
+We can vectorize raster dataset using the `vectorize()` function from the `ghslpy.vectorize` module.
+
+```python
+ghs_smod = ghslpy.download(
+    products=["GHS-SMOD"],
+    epoch=epochs,
+    resolution="1000m",
+    region=buffered,
+)
+# Vectorize the Settlements Model (SMOD) raster dataset
+vectors = ghslpy.vectorize(ghs_smod)
+vectors.head()
+```
+
+|    | GHS_SMOD                        | geometry                                                                                                                                                                                                 | date       |   class_value | domain       |
+|---:|:--------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|--------------:|:-------------|
+|  0 | Rural cluster grid cell         | POLYGON ((...))     | 1975-01-01 |            13 | Rural domain |
+|  1 | Low Density Rural grid cell     | POLYGON ((...))   | 1975-01-01 |            12 | Rural domain |
+|  2 | Low Density Rural grid cell     | POLYGON ((...)) | 1975-01-01 |            12 | Rural domain |
+|  3 | Suburban or per-urban grid cell | POLYGON ((...))    | 1975-01-01 |            21 | Urban domain |
+|  4 | Low Density Rural grid cell     | POLYGON ((...))   | 1975-01-01 |            12 | Rural domain |
+
+```
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

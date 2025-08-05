@@ -1,6 +1,5 @@
 from .download import download
-from .vectors.vectorize import vectorize
-from .vectors.smod_functions import smod_year_of_transition
+from .vectorize import vectorize
 from .products import get_product_info, PRODUCTS
 from .utils import (
     list_products,

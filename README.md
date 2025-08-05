@@ -1,4 +1,4 @@
-# ghslpy: Global Human Settlement Layer Python
+# ghslpy
 
 `ghslpy` is a Python tool for downloading, analyzing, and visualizing data from the [Global Human Settlement Layer (GHSL)](https://ghsl.jrc.ec.europa.eu/). It provides a simple interface to fetch GHSL products for specific regions and time periods, and integrates with popular data analysis and plotting libraries like `xarray`, `pandas`, and `matplotlib`.
 

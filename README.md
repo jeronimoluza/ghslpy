@@ -48,8 +48,6 @@ print(f"Variables: {list(data.data_vars)}")
 
 ### Additional Features
 
-Besides downloading data for a user-defined region, `ghslpy` provides utility functions to obtain boundaries from other sources.
-
 #### Finding Regions with OpenStreetMap
 
 The `ghslpy.utils.find_region` function allows you to get the boundary of a region using an OpenStreetMap query.
@@ -80,7 +78,7 @@ nigeria_provinces = utils.download_gadm("NGA", adm_level=1)
 
 ## Analysis and Visualization
 
-The downloaded `xarray.Dataset` can be used for various analyses. The example notebook demonstrates how to calculate and visualize growth statistics.
+The downloaded `xarray.Dataset` can be used for various analyses.
 
 ### Growth Statistics
 

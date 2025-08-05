@@ -146,7 +146,6 @@ vectors.head()
 |  3 | Suburban or per-urban grid cell | POLYGON ((...))    | 1975-01-01 |            21 | Urban domain |
 |  4 | Low Density Rural grid cell     | POLYGON ((...))   | 1975-01-01 |            12 | Rural domain |
 
-```
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

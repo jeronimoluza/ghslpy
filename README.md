@@ -146,6 +146,11 @@ vectors.head()
 |  3 | Suburban or per-urban grid cell | POLYGON ((...))    | 1975-01-01 |            21 | Urban domain |
 |  4 | Low Density Rural grid cell     | POLYGON ((...))   | 1975-01-01 |            12 | Rural domain |
 
+
+Using the Settlements Model (SMOD), we can calculate the year each pixel turned part of the Urban Centre as classified by the model:
+
+![SMOD Year of Transition](./assets/smod_year_of_transition.png)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

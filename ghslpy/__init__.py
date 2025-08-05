@@ -13,7 +13,6 @@ from .utils import (
 __all__ = [
     "download",
     "vectorize",
-    "smod_year_of_transition",
     "get_product_info",
     "PRODUCTS",
     "list_products",

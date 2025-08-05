@@ -124,7 +124,7 @@ Plotting the difference between two years highlights the areas with the most sig
 
 ### Vectorization
 
-We can vectorize raster dataset using the `vectorize()` function from the `ghslpy.vectorize` module.
+We can vectorize raster datasets using the `vectorize()` function from the `ghslpy.vectorize` module.
 
 ```python
 ghs_smod = ghslpy.download(

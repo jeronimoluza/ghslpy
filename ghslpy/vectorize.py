@@ -2,7 +2,7 @@ from geocube.vector import vectorize as geocube_vectorize
 import xarray as xr
 import geopandas as gpd
 import pandas as pd
-from ..products import get_product_info
+from .products import get_product_info
 
 
 def vectorize(data: xr.Dataset):

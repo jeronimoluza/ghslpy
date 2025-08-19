@@ -5,12 +5,13 @@ import pandas as pd
 from .products import get_product_info
 
 
-def vectorize(data: xr.Dataset):
+def vectorize(data: xr.Dataset, classify: bool = False):
     """
     Vectorize an xarray Dataset into a GeoDataFrame.
 
     Args:
         data (xr.Dataset): Dataset to vectorize
+        classify (bool, optional): Whether to classify the data according to product documentation. Defaults to False.
 
     Returns:
         geopandas.GeoDataFrame: Vectorized data with geometry and variable values
@@ -21,8 +22,8 @@ def vectorize(data: xr.Dataset):
     [var_name] = list(data.data_vars.keys())
 
     # Variable name for GHS_BUILT_C shows as GHS_BUILT
-    if var_name == "GHS_BUILT":
-        var_name = "GHS_BUILT_C"
+    # if var_name == "GHS_BUILT":
+        # var_name = "GHS_BUILT_C"
 
     # Check if the dataset has a time dimension
     if "time" in data.sizes and data.sizes["time"] > 1:
@@ -43,7 +44,8 @@ def vectorize(data: xr.Dataset):
             date_str = pd.to_datetime(str(time_val)).strftime("%Y-%m-%d")
             gdf["date"] = date_str
 
-            apply_classifications(gdf, var_name)
+            if classify:
+                apply_classifications(gdf, var_name)
 
             gdfs.append(gdf)
 
@@ -59,7 +61,8 @@ def vectorize(data: xr.Dataset):
             data.to_array().rename(var_name).squeeze().astype(float)
         )
 
-        apply_classifications(gdf, var_name)
+        if classify:
+            apply_classifications(gdf, var_name)
 
         return gdf.to_crs("EPSG:4326")
 

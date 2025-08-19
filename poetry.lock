@@ -341,24 +341,6 @@ files = [
 ]
 
 [[package]]
-name = "cf-xarray"
-version = "0.10.6"
-description = "A convenience wrapper for using CF attributes on xarray objects"
-optional = false
-python-versions = ">=3.10"
-groups = ["main"]
-files = [
-    {file = "cf_xarray-0.10.6-py3-none-any.whl", hash = "sha256:39b457e47bb1557749ede115d1126ad9340eafb26ddeea0fef3a81149fc4d019"},
-    {file = "cf_xarray-0.10.6.tar.gz", hash = "sha256:159236eca465453784ee7efa2a430d5e2092978db8a5d4d8b591f61d0639cb89"},
-]
-
-[package.dependencies]
-xarray = ">=2023.09.0"
-
-[package.extras]
-all = ["matplotlib", "pint (>=0.18,!=0.24.0)", "pooch", "regex", "rich", "shapely"]
-
-[[package]]
 name = "cffi"
 version = "1.17.1"
 description = "Foreign Function Interface for Python calling C code."
@@ -3835,47 +3817,6 @@ types = ["pandas-stubs", "scipy-stubs", "types-PyYAML", "types-Pygments", "types
 viz = ["cartopy", "matplotlib", "nc-time-axis", "seaborn"]
 
 [[package]]
-name = "xproj"
-version = "0.2.1"
-description = "Xarray extension for projections and coordinate reference systems"
-optional = false
-python-versions = ">=3.10"
-groups = ["main"]
-files = [
-    {file = "xproj-0.2.1-py3-none-any.whl", hash = "sha256:d762c540c1bc4abc5955b4034b409b9b2f7733c3e49285f3aeb71f9a2dd6bf34"},
-    {file = "xproj-0.2.1.tar.gz", hash = "sha256:d520c7a0df402f6a5922108ed614c8ea0ce6b04bec12c91aceb75fe3c1d3c5c3"},
-]
-
-[package.dependencies]
-pyproj = "*"
-xarray = "*"
-
-[package.extras]
-test = ["pytest"]
-
-[[package]]
-name = "xvec"
-version = "0.5.0"
-description = "Vector data cubes for Xarray"
-optional = false
-python-versions = ">=3.10"
-groups = ["main"]
-files = [
-    {file = "xvec-0.5.0-py3-none-any.whl", hash = "sha256:541bfaa43afd18848f64f9da8d7fb74a180dfac05bcc803b04fe0872f626b278"},
-    {file = "xvec-0.5.0.tar.gz", hash = "sha256:c5daad2e61386a4abd5d81b511a2b501986d85ec2febe3a32e3f1af24fca6571"},
-]
-
-[package.dependencies]
-cf_xarray = ">=0.9.2"
-pyproj = ">=3.0.0"
-shapely = ">=2.0b1"
-xarray = ">=2022.12.0"
-xproj = ">=0.2.0"
-
-[package.extras]
-all = ["geopandas", "matplotlib", "xproj"]
-
-[[package]]
 name = "xyzservices"
 version = "2025.4.0"
 description = "Source of XYZ tiles providers"
@@ -3890,4 +3831,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "31a0502eaf6d222b5997d954cbe8c168f41af58c913b6ba83944b6f9f34d1918"
+content-hash = "142f052072946b08a5ea349a37b15227ea34b34537062236bca7c9d131086622"

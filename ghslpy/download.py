@@ -33,7 +33,7 @@ def download(
     # Convert products to list if it's a string
     if isinstance(products, str):
         products = [products]
-    
+
     if isinstance(epoch, list):
         # Download data for each epoch and each product
         all_datasets = []
@@ -47,15 +47,13 @@ def download(
                 time_coord = f"{e}-01-01"  # Format as YYYY-MM-DD
                 ds = ds.expand_dims({"time": [time_coord]})
                 epoch_datasets.append(ds)
-            
+
             # Merge all products for this epoch
             if epoch_datasets:
                 merged_epoch_ds = xr.merge(epoch_datasets)
                 all_datasets.append(merged_epoch_ds)
             else:
-                raise ValueError(
-                    f"Failed to download data for epoch: {e}"
-                )
+                raise ValueError(f"Failed to download data for epoch: {e}")
 
         # Merge all datasets along the time dimension
         if all_datasets:
@@ -75,15 +73,13 @@ def download(
             time_coord = f"{epoch}-01-01"  # Format as YYYY-MM-DD
             ds = ds.expand_dims({"time": [time_coord]})
             product_datasets.append(ds)
-        
+
         # Merge all products
         if product_datasets:
             merged_ds = xr.merge(product_datasets)
             return merged_ds
         else:
-            raise ValueError(
-                f"Failed to download data for epoch: {epoch}"
-            )
+            raise ValueError(f"Failed to download data for epoch: {epoch}")
 
 
 def download_single(
@@ -271,7 +267,6 @@ def _download_and_process_zip(url, region_gdf):
     with tempfile.TemporaryDirectory() as temp_dir:
         # Download the zip file
         zip_path = os.path.join(temp_dir, "download.zip")
-        print(f"Downloading {url}...")
         urllib.request.urlretrieve(url, zip_path)
 
         # Extract the zip file
